@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quarkus-otel
+  labels:
+    app: quarkus-otel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quarkus-otel
+  template:
+    metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-java: "true"
+      labels:
+        app: quarkus-otel
+    spec:
+      containers:
+      - name: quarkus-otel
+        image: g1raffi/quarkus-otel:latest
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 1337
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault
+          runAsNonRoot: true
+        ports:
+        - containerPort: 8080

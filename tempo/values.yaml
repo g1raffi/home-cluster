@@ -1,0 +1,123 @@
+# Env vars MINIO_ACCESS_KEY and MINIO_SECRET_KEY
+#    - name: MINIO_ACCESS_KEY
+    #   value: grafana-tempo
+    # - name: MINIO_SECRET_KEY
+    #   value: supersecret
+---
+global:
+  extraEnvFrom:
+    - secretRef:
+        name: minio-secret
+
+metaMonitoring:
+  serviceMonitor: 
+    enabled: true
+    labels:
+      home-cluster: qemu-cluster
+
+tempo:
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  structuredConfig:
+    storage:
+      trace:
+        backend: s3
+        s3:
+          access_key: ${MINIO_ACCESS_KEY}
+          bucket: tempo-traces
+          endpoint: tempo-minio:9000
+          insecure: true
+          secret_key: ${MINIO_SECRET_KEY}
+ingester:
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  extraEnvFrom:
+    - secretRef:
+        name: minio-secret
+  extraArgs:
+    - -config.expand-env=true
+  replicas: 1
+  resources:
+    limits:
+      memory: 1Gi
+      cpu: 500m
+  config:
+    replication_factor: 1
+compactor:
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  extraEnvFrom:
+    - secretRef:
+        name: minio-secret
+  extraArgs:
+    - -config.expand-env=true
+distributor:
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  extraEnvFrom:
+    - secretRef:
+        name: minio-secret
+  extraArgs:
+    - -config.expand-env=true
+querier:
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  extraEnvFrom:
+    - secretRef:
+        name: minio-secret
+  extraArgs:
+    - -config.expand-env=true
+queryFrontend:
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  extraEnvFrom:
+    - secretRef:
+        name: minio-secret
+  extraArgs:
+    - -config.expand-env=true
+
+# storage:
+#   trace:
+#     backend: s3
+#     s3:
+#       access_key: ${MINIO_ACCESS_KEY}
+#       secret_key: ${MINIO_SECRET_KEY}
+#       bucket: 'tempo-traces'
+#       endpoint: 'tempo-minio:9000'
+#       insecure: true
+      # access_key: 'grafana-tempo'
+      # secret_key: 'supersecret'
+      # bucket: 'tempo-traces'
+      # endpoint: 'tempo-minio:9000'
+      # insecure: true
+#MinIO storage configuration
+minio:
+  enabled: true
+  mode: standalone
+  rootUser: grafana-tempo
+  rootPassword: supersecret
+  buckets:
+    # Default Tempo storage bucket
+    - name: tempo-traces
+      policy: none
+      purge: false
+traces:
+  otlp:
+    grpc:
+      enabled: true
+    http:
+      enabled: true
+  zipkin:
+    enabled: false
+  jaeger:
+    thriftHttp:
+      enabled: false
+  opencensus:
+    enabled: false
+
