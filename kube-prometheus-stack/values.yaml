@@ -20,6 +20,7 @@ prometheus:
   ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#prometheusspec
   ##
   prometheusSpec:
+    enableRemoteWriteReceiver: true
     ## How long to retain metrics
     ##
     retention: 1d

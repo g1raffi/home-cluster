@@ -9,11 +9,29 @@ global:
     - secretRef:
         name: minio-secret
 
+global_overrides:
+  metrics_generator_processors: [service-graphs, span-metrics]
+
 metaMonitoring:
   serviceMonitor: 
     enabled: true
     labels:
       home-cluster: qemu-cluster
+
+metricsGenerator:
+  extraEnvFrom:
+    - secretRef:
+        name: minio-secret
+  extraArgs:
+    - -config.expand-env=true
+  enabled: true
+  config:
+    storage:
+      remote_write_flush_deadline: 20s
+      remote_write:
+        - name: prometheus-stack
+          url: "http://prometheus-kube-prometheus-prometheus.prometheus.svc.cluster.local:9090/api/v1/write"
+          send_exemplars: true
 
 tempo:
   securityContext:
