@@ -34,9 +34,7 @@ metricsGenerator:
           send_exemplars: true
 
 tempo:
-  securityContext:
-    seccompProfile:
-      type: RuntimeDefault
+  securityContext: {}
   structuredConfig:
     storage:
       trace:

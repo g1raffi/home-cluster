@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tempo-datasource
+  labels:
+    grafana_datasource: "1"
+data:
+  tempo-datasource.json: |
+    apiVersion: 1
+    datasources:
+    - access: proxy
+      name: tempo
+      type: tempo
+      url: http://tempo-query-frontend.tempo.svc.cluster.local:3100
+      version: 1
+      uid: tempo

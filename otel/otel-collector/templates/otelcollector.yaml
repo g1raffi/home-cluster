@@ -1,0 +1,10 @@
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: {{ include "otel-collector.fullname" . }}
+  labels:
+    {{- include "otel-collector.labels" . | nindent 4 }}
+spec:
+  mode: {{ .Values.collector.mode }}
+  config:
+    {{- toYaml .Values.collector.config | nindent 4}}

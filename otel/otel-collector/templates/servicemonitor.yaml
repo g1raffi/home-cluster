@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "otel-collector.fullname" . }}
+  labels:
+    {{- include "otel-collector.labels" . | nindent 4 }}
+spec:
+  endpoints:
+  - interval: 30s
+    targetPort: 8888
+    path: /metrics
+    scheme: http
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: opentelemetry-collector
+      operator.opentelemetry.io/collector-service-type: monitoring

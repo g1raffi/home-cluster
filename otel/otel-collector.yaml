@@ -19,6 +19,12 @@ spec:
       batch:
         send_batch_size: 10000
         timeout: 10s
+      filter/health:
+        traces:
+          span:
+            - 'IsMatch(attributes["http.route"], ".*/actuator/.*")'
+            - 'IsMatch(attributes["http.target"], ".*/q/metrics")'
+            #            - 'IsMatch(attributes["http.route"], "/q*")'
 
     exporters:
       debug: {}
@@ -31,5 +37,5 @@ spec:
       pipelines:
         traces:
           receivers: [otlp]
-          processors: [memory_limiter, batch]
+          processors: [memory_limiter, batch, filter/health]
           exporters: [debug, otlp/tempo]
